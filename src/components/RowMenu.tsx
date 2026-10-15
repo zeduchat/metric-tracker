@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { UpdateStatusModal, type UpdateStatusSubmission } from "./UpdateStatusModal";
 
-export function RowMenu({ label }: { label: string }) {
+export function RowMenu({ label, submission }: { label: string; submission?: UpdateStatusSubmission }) {
   const [open, setOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export function RowMenu({ label }: { label: string }) {
 
       {open && (
         <div className="row-dropdown" role="menu">
-          <button className="row-dropdown-item" role="menuitem" type="button" onClick={() => setOpen(false)}>
+          <button className="row-dropdown-item" role="menuitem" type="button" onClick={() => { setOpen(false); if (submission) setModalOpen(true); }}>
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="6.5" cy="6.5" r="5" />
               <polyline points="4,6.5 6,8.5 9,5" />
@@ -61,6 +63,13 @@ export function RowMenu({ label }: { label: string }) {
             Delete
           </button>
         </div>
+      )}
+      {submission && (
+        <UpdateStatusModal
+          open={modalOpen}
+          submission={submission}
+          onClose={() => setModalOpen(false)}
+        />
       )}
     </div>
   );

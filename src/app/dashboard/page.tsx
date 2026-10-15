@@ -236,7 +236,7 @@ export default async function DashboardPage() {
                       {sub.traffic ?? "—"}
                     </td>
                     <td className="td-actions">
-                      <RowMenu label={`More options for ${sub.product} on ${sub.directory}`} />
+                      <RowMenu label={`More options for ${sub.product} on ${sub.directory}`} submission={{ id: sub.id, product: sub.product, directory: sub.directory, status: sub.status as "live" | "pending" | "review" | "rejected" }} />
                     </td>
                   </tr>
                 ))}
