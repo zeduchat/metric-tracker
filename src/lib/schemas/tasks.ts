@@ -74,3 +74,22 @@ export const taskErrorSchema = z
     details: z.record(z.string(), z.array(z.string())).optional(),
   })
   .openapi("TaskError");
+
+export const offerCreateSchema = z
+  .object({
+    agentId: z.string().trim().min(1, "Agent ID is required"),
+  })
+  .openapi("OfferCreate");
+
+export const offerAcceptSchema = z.object({}).openapi("OfferAccept");
+
+export const taskOfferedSchema = z
+  .object({
+    id: z.string(),
+    status: z.string(),
+    offeredToAgentId: z.string().nullable(),
+    offeredAt: z.string().nullable(),
+    offerExpiresAt: z.string().nullable(),
+    assignedAgentId: z.string().nullable(),
+  })
+  .openapi("TaskOffered");

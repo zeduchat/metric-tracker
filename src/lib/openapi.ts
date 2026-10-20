@@ -30,9 +30,12 @@ import {
 } from "@/lib/schemas/media";
 import { overviewErrorSchema, overviewSummarySchema } from "@/lib/schemas/overview";
 import {
+  offerAcceptSchema,
+  offerCreateSchema,
   taskCreateSchema,
   taskErrorSchema,
   taskItemSchema,
+  taskOfferedSchema,
   taskUpdateSchema,
 } from "@/lib/schemas/tasks";
 
@@ -44,6 +47,13 @@ registry.registerComponent("securitySchemes", "sessionCookie", {
   in: "cookie",
   name: "next-auth.session-token",
   description: "NextAuth session cookie — obtained after Google OAuth sign-in at `/api/auth/signin`.",
+});
+
+registry.registerComponent("securitySchemes", "agentKey", {
+  type: "apiKey",
+  in: "header",
+  name: "authorization",
+  description: "Agent API key as `Bearer <agent-key>`. Alternatively send `X-Agent-Key` header.",
 });
 
 registry.registerPath({
@@ -574,6 +584,54 @@ registry.registerPath({
   responses: {
     204: { description: "Task deleted" },
     401: { description: "Unauthorized" },
+    404: { description: "Not found" },
+  },
+});
+
+const offerError = { content: { "application/json": { schema: taskErrorSchema } } };
+
+registry.registerPath({
+  method: "post",
+  path: "/api/tasks/{id}/offer",
+  operationId: "offerTask",
+  tags: ["Tasks"],
+  summary: "Offer an open or bidding task to an agent (human / Review Coordinator)",
+  description: "Sets offeredToAgentId, offeredAt and offerExpiresAt (now + 24h), and moves the task to bidding status.",
+  security: [{ sessionCookie: [] }],
+  request: {
+    params: taskIdParams,
+    body: { content: { "application/json": { schema: offerCreateSchema } } },
+  },
+  responses: {
+    200: {
+      description: "Task offered",
+      content: { "application/json": { schema: taskOfferedSchema } },
+    },
+    400: { description: "Validation failed, or task is not open for offers", ...offerError },
+    401: { description: "Unauthorized" },
+    404: { description: "Not found" },
+  },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/tasks/{id}/accept-offer",
+  operationId: "acceptTaskOffer",
+  tags: ["Tasks"],
+  summary: "Accept an offered task (offered agent, authenticated via agent key)",
+  description: "Verifies the offer is unexpired and addressed to the calling agent, enforces the 2 active in-progress task limit, then assigns the agent and moves the task to in_progress.",
+  security: [{ agentKey: [] }],
+  request: {
+    params: taskIdParams,
+    body: { content: { "application/json": { schema: offerAcceptSchema } } },
+  },
+  responses: {
+    200: {
+      description: "Offer accepted, task assigned",
+      content: { "application/json": { schema: taskOfferedSchema } },
+    },
+    400: { description: "Validation failed, no offer, expired, or at task limit", ...offerError },
+    401: { description: "Unauthorized / agent authentication required" },
     404: { description: "Not found" },
   },
 });
