@@ -78,9 +78,9 @@ export function ProjectSwitcher({ projects }: { projects: CurrentProject[] }) {
           current
           className="size-9 rounded-full text-[13px] ring-4 ring-accent transition-shadow group-aria-expanded:ring-card"
         />
-        <span className="hidden min-w-0 items-center gap-2 sm:flex">
+        <span className="flex min-w-0 flex-1 items-center gap-2">
           <span className="truncate text-[15px] font-extrabold tracking-[-0.025em]">{current.name}</span>
-          <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-2xs font-bold tracking-[0.07em] text-muted-foreground uppercase transition-colors group-aria-expanded:bg-card group-aria-expanded:text-primary-deep">
+          <span className="hidden shrink-0 rounded-full bg-muted px-2 py-0.5 text-2xs font-bold tracking-[0.07em] text-muted-foreground uppercase transition-colors group-aria-expanded:bg-card group-aria-expanded:text-primary-deep sm:inline-flex">
             {ROLE_LABELS[current.role]}
           </span>
         </span>
